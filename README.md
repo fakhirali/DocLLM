@@ -21,7 +21,23 @@ Using llms to chat with pdfs.
 - [ ] Faster inference (ggml, quantization)
 - [ ] Better models
 
+```mermaid
+graph LR
+em_model[Embeddings Model]
+vs[Vector Store]
+llm[LLM]
+q[Query]
+subgraph ingestion
+pdf[PDF] --> em_model --save--> vs
+end
+subgraph chat
+q --> em_model --search--> vs
+q --> llm
+vs --top k text extracts--> llm
+llm --> answer
+end
 
+```
 
 
 Notes:  
