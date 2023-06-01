@@ -17,6 +17,7 @@ Using llms to chat with pdfs.
 - [x] front-end ([Implemented](/chat.py) in [gradio](https://gradio.app/))
 - [ ] Show from where the answer was extracted
 - [ ] Faster inference (ggml, quantization)
+- [ ] Better models
 
 
 ### Applications
