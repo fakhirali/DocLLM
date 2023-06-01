@@ -66,7 +66,7 @@ def get_embeddings(texts):
 
 prompt = f'''
 Below is a user query that describes a question. Write a response that appropriately answers the query using the 
-information given in the input. The information is extracted from a research paper.
+information given in the input. The information is extracted from a research paper. Be consise and precise in your response.
 
 
 
