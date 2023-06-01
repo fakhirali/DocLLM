@@ -2,6 +2,7 @@
 
 Using llms to chat with pdfs.
 
+
 ### Approach
 - [x] Parse the pdfs (Using [pypdf2](https://github.com/py-pdf/pypdf))
 - [ ] Improve parsing (Remove headers, footers, page numbers etc)
@@ -14,6 +15,7 @@ Using llms to chat with pdfs.
 - [x] Compute top-k text chunks from the Vector store
 - [x] Use these chunks in the pre prompt of the llm to answer the question (Using [databricks/dolly-v2-3b](https://huggingface.co/databricks/dolly-v2-3b))
 - [x] front-end ([Implemented](/chat.py) in [gradio](https://gradio.app/))
+- [ ] Show from where the answer was extracted
 - [ ] Faster inference (ggml, quantization)
 
 
