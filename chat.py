@@ -25,8 +25,8 @@ def average_pool(last_hidden_states: Tensor,
     return last_hidden.sum(dim=1) / attention_mask.sum(dim=1)[..., None]
 
 
-tokenizer = AutoTokenizer.from_pretrained('intfloat/e5-base-v2')
-embeddings_model = AutoModel.from_pretrained('intfloat/e5-base-v2')
+tokenizer = AutoTokenizer.from_pretrained('BAAI/bge-large-zh-v1.5')
+embeddings_model = AutoModel.from_pretrained('BAAI/bge-large-zh-v1.5')
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 # device = 'cpu'
 embeddings_model.to(device)
