@@ -2,6 +2,10 @@
 
 Using llms to chat with pdfs.
 
+### TODO
+- [ ] Fix the chat stuff
+  - [ ] Use llama of smth
+
 
 ```mermaid
 graph LR
