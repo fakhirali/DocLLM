@@ -13,13 +13,14 @@ import re
 import faiss
 from tqdm import tqdm
 import pickle as pkl
+from utils import get_embeddings
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
-path = 'ai_papers/'
-chunk_size = 5
-overlap = 2
-split_char = '\n\n'
+path = 'embeddings'
+chunk_size = 2
+overlap = 0
+split_char = '.'
 
 
 @torch.no_grad()
@@ -35,28 +36,16 @@ embeddings_model.to(device)
 embeddings_model.eval()
 
 
-@torch.no_grad()
-def get_embeddings(texts):
-    # Tokenize the input texts
-    batch_dict = tokenizer(texts, max_length=512, padding=True, truncation=True, return_tensors='pt').to(device)
-
-    outputs = embeddings_model(**batch_dict)
-    embeddings = outputs[0][:, 0]
-    # embeddings = average_pool(outputs.last_hidden_state, batch_dict['attention_mask']).to('cpu')
-
-    # (Optionally) normalize embeddings
-    embeddings = F.normalize(embeddings, p=2, dim=1)
-    return embeddings.cpu().numpy()
 
 
 class Chuncker:
     def __init__(self, chunck_size=3, chunk_overlap=1, split_char='.'):
-        # chunk_size is in words (after .split())
         self.chunck_size = chunck_size
         self.chunk_overlap = chunk_overlap
+        self.split_char = split_char
 
     def get_chunks(self, text):
-        all_words = text.split('.')
+        all_words = text.split(self.split_char)
         chunks = []
         for i in range(0, len(all_words), self.chunck_size - self.chunk_overlap):
             chunks.append('passage: ' + ' '.join(all_words[i:i + self.chunck_size]))
@@ -67,29 +56,18 @@ chunker = Chuncker(chunck_size=chunk_size, chunk_overlap=overlap, split_char=spl
 
 index = faiss.IndexFlatL2(embeddings_model.config.hidden_size)
 
-pdf_files = [x for x in os.listdir(path) if 'pdf' in x]
 
 text_info = []
 
-for file in tqdm(pdf_files):
-    reader = PdfReader(path + file)
-    text = ""
-    for page in reader.pages:
-        p_text = page.extract_text()
-        # Merge hyphenated words
-        p_text = re.sub(r"(\w+)-\n(\w+)", r"\1\2", p_text)
-        # Fix newlines in the middle of sentences
-        p_text = re.sub(r"(?<!\n\s)\n(?!\s\n)", " ", p_text.strip())
-        # Remove multiple newlines
-        p_text = re.sub(r"\n\s*\n", "\n\n", p_text)
-        text += p_text + '\n'
 
-    text_chunks = chunker.get_chunks(text)
-    text_info.extend([(file, x) for x in text_chunks])
-    # The following is probably slow, should batch this
-    text_embeddings = np.array([get_embeddings([x]) for x in text_chunks]).reshape(len(text_chunks), -1)
-    index.add(text_embeddings)
+text = open('atomic_habits.txt', 'r').read()
 
-faiss.write_index(index, f'embeddings/{path.replace("/", "_").strip("_")}.index')
+text_chunks = chunker.get_chunks(text)
+text_info.extend([x for x in text_chunks])
+# The following is probably slow, should batch this
+text_embeddings = np.array([get_embeddings([x], tokenizer, embeddings_model) for x in tqdm(text_chunks)]).reshape(len(text_chunks), -1)
+index.add(text_embeddings)
+name = "atomic_habits"
+faiss.write_index(index, f'embeddings/{name}.index')
 
-pkl.dump(text_info, open(f'embeddings/{path.replace("/", "_").strip("_")}_text_info.pkl', 'wb'))
+pkl.dump(text_info, open(f'embeddings/{name}_text_info.pkl', 'wb'))

@@ -3,9 +3,12 @@
 Using llms to chat with pdfs.
 
 ### TODO
-- [ ] Fix the chat stuff
-  - [ ] Use llama of smth
-
+- [ ] Use llama
+- [ ] make better abstractions
+  - [ ] Embeddings Model
+  - [ ] Vector Store
+  - [ ] LLM
+- [ ] Better chunking
 
 ```mermaid
 graph LR
