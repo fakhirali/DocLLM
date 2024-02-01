@@ -3,7 +3,7 @@
 Using llms to chat with pdfs.
 
 ### TODO
-- [ ] Use llama
+- [x] Use llama
 - [ ] make better abstractions
   - [ ] Embeddings Model
   - [ ] Vector Store

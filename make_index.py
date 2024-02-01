@@ -18,7 +18,7 @@ from utils import get_embeddings
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 path = 'embeddings'
-chunk_size = 2
+chunk_size = 3
 overlap = 0
 split_char = '.'
 

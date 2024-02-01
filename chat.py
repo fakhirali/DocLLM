@@ -10,7 +10,7 @@ import faiss
 import pickle as pkl
 import gradio as gr
 from utils import get_embeddings
-
+from llm import LLM
 
 name = 'atomic_habits'
 
@@ -30,27 +30,26 @@ embeddings_model.eval()
 pass
 
 
+chatbot = LLM()
 index = faiss.read_index(f'embeddings/{name}.index')
 text_info = pkl.load(open(f'embeddings/{name}_text_info.pkl', 'rb'))
 
 
-def get_answer(query, use_information, k, temp):
-    query = 'query: ' + query
+def get_answer(query, k):
+    query = query
     query_embedding = get_embeddings([query], tokenizer, embeddings_model)
     scores, text_idx = index.search(query_embedding, k)
     text_idx = text_idx.flatten()
     info = '\n--------\n'.join(np.array(text_info)[text_idx])
     info = info.replace('passage: ', '').strip()
-    print('\nInformation: \n\n', info)
-    return '' + '\n\nInformation: \n\n' + info + '\n\n'
+    ans = chatbot.get_response(query, info)
+    return ans + '\n-------------Information: \n' + info + '\n---------\n'
 
 
 demo = gr.Interface(
     fn=get_answer,
     inputs=[gr.Textbox(lines=3, placeholder="User Query"),
-            gr.Checkbox(value=True),
-            gr.Slider(1, 10, step=1, value=3),
-            gr.Slider(0, 1, step=0.1, value=0.3)],
+            gr.Slider(1, 10, step=1, value=3)],
     outputs="text",
 )
 demo.launch()
