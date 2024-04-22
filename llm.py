@@ -1,13 +1,15 @@
 from llama_cpp import Llama
+from langchain_community.llms import Ollama
 
 class LLM:
     def __init__(self):
-        self.llm = Llama(
-            model_path="models/llama-2-7b-chat.Q4_K_M.gguf",
-            chat_format="llama-2",
-            n_gpu_layers=-1,
-            n_ctx=4096
-        )
+        self.llm = Ollama(model ='codellama:latest')
+        # self.llm = Llama(
+        #     model_path="models/llama-2-7b-chat.Q4_K_M.gguf",
+        #     chat_format="llama-2",
+        #     n_gpu_layers=-1,
+        #     n_ctx=4096
+        # )
         self.messages = [
             {"role": "system",
              "content": "You are an assistant who answers a user's question based on the information provided."},
@@ -18,16 +20,12 @@ class LLM:
         Information: {information}
         '''
         self.messages.append({"role": "user", "content": query})
-        out = self.llm.create_chat_completion(messages=self.messages)
-        response = out["choices"][-1]['message']["content"]
-        return response
+        out = self.llm.invoke(input=self.messages)
+        return out
 
 if __name__ == "__main__":
-    llm = Llama(
-        model_path="models/llama-2-7b-chat.Q4_K_M.gguf",
-        chat_format="llama-2",
-        n_gpu_layers=-1,
-        n_ctx=4096
+    llm = Ollama(
+        model ='codellama:latest'
     )
     messages = [
         {"role": "system",
@@ -62,7 +60,5 @@ if __name__ == "__main__":
     '''
 
     messages.append({"role":"user", "content":q})
-    out = llm.create_chat_completion(messages=messages)
+    out = llm.invoke(input=messages)
     print(out)
-    response = out["choices"][-1]['message']["content"]
-    print(response)
